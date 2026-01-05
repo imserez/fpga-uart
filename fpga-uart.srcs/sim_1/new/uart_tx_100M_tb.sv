@@ -3,9 +3,9 @@
 // Company: 
 // Engineer: 
 // 
-// Create Date: 01/05/2026 11:19:43 AM
+// Create Date: 01/05/2026 03:22:50 PM
 // Design Name: 
-// Module Name: uart_tx_tb
+// Module Name: uart_tx_100M_tb
 // Project Name: 
 // Target Devices: 
 // Tool Versions: 
@@ -20,8 +20,7 @@
 //////////////////////////////////////////////////////////////////////////////////
 
 
-module uart_tx_tb;
-
+module uart_tx_100M_tb;
 
     logic   clk;
     logic   reset;
@@ -30,8 +29,8 @@ module uart_tx_tb;
     logic   tx;
     logic   busy;
 
-
-    uart_tx #(.CLK_FREQ(1_000_000), .BAUD_RATE(10_000)) dut (
+    // 100_000_000 ||  9600 / 115200
+    uart_tx #(.CLK_FREQ(100_000_000), .BAUD_RATE(115200)) dut (
         .clk(clk),
         .reset(reset),
         .start(start),
@@ -41,23 +40,22 @@ module uart_tx_tb;
     );
     
     initial clk = 0;
-    always #10 clk = ~clk;  // 50 kHz
+    always #5 clk = ~clk;  // 100 MHz
     
     initial begin
         reset = 1;
         start = 0;
         data = 8'h41;   // A= 0b0101_0001
-        
         #100;
-        
         reset = 0;
-        
         #100;
-        start = 1;      // start transmission
-        #40;
+        
+        @(posedge clk);
+        start = 1;
+        @(posedge clk);
         start = 0;
-        wait (!busy);
-        #200;
+
+        #10_000_000;
         $finish;
     end
 
