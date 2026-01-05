@@ -21,7 +21,7 @@
 
 
 module debouncer #(
-    parameter LIMIT = 1_000_000, // 10ms a 100MHz
+    parameter LIMIT = 1_000_000, 
     parameter N = 20            
 )(
     input  logic clk,
@@ -31,7 +31,7 @@ module debouncer #(
 );
 
     logic [N-1:0] count;
-    logic sync_0, sync_1;
+    logic sync_0, sync_1; 
 
     always_ff @(posedge clk or posedge reset) begin
         if (reset) begin

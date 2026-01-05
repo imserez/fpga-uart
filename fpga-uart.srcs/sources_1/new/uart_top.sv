@@ -25,7 +25,7 @@ module uart_top(
     input  logic btnC,
     input  logic btnU,
     output logic uart_txd_out,
-    output logic led_tx
+    output logic [1:0] led 
 );
 
     logic start;
@@ -33,30 +33,29 @@ module uart_top(
     logic btnU_prev;
     logic db_btnU;
 
-    assign led_tx = uart_txd_out;
-    
+    assign led[0] = db_btnU; 
+    assign led[1] = busy;    
+
     debouncer db_up (
         .clk(clk),
         .signal(btnU),
         .reset(btnC),
         .debounced_signal(db_btnU)
     );
-    
-    
+
     always_ff @(posedge clk) begin
-        if (btnC) begin // reset
+        if (btnC) begin
             btnU_prev <= 0; 
             start <= 0;
-        end
-        else begin
-            if (!busy)
-                start <= db_btnU & ~btnU_prev;
+        end else begin
+            if (!busy && (db_btnU && !btnU_prev))
+                start <= 1'b1;
             else
                 start <= 1'b0;
             btnU_prev <= db_btnU;
         end
     end
-    
+
     uart_tx #(
         .CLK_FREQ (100_000_000),
         .BAUD_RATE(9600)
@@ -68,7 +67,4 @@ module uart_top(
         .tx    (uart_txd_out),
         .busy  (busy)
     );
-
 endmodule
-
- 
