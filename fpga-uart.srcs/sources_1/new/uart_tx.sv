@@ -32,6 +32,35 @@ module uart_tx #(
     output      logic busy          // busy-bit
 );
 
+    localparam integer BAUD_TICKS = CLK_FREQ / BAUD_RATE;
+    
+    typedef enum logic [1:0] {      // FSM
+        IDLE,
+        START_BIT,
+        DATA_BITS,
+        STOP_BIT
+    } state_t;
+    
+    state_t         state;
+    logic [15:0]    baud_cnt;
+    logic [2:0]     bit_idx;
+    logic [7:0]     shift_reg;
+    
+    always_ff   @(posedge clk or posedge reset) begin
+        if (reset) begin
+            state       <= IDLE;
+            baud_cnt    <= 0;
+            bit_idx     <= 0;
+            shift_reg   <= 0;
+            tx          <= 0;
+            busy        <= 0;
+        end
+        else begin
+        
+        end
+    
+    end
+    
 // TODO: 
 /*
    - FSM: [idle] -> [start_bit] -> [data_bits] -> [stop_bit]
