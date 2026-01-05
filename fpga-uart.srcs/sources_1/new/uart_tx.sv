@@ -56,17 +56,55 @@ module uart_tx #(
             busy        <= 0;
         end
         else begin
-        
+            case(state)         // FSM implementation
+                IDLE: begin
+                    tx              <= 1;
+                    busy            <= 0;
+                    baud_cnt        <= 0;
+                    if (start) begin
+                        shift_reg   <= data;
+                        state       <= START_BIT;
+                        busy        <= 1;
+                    end
+                 end
+                 
+                 START_BIT: begin
+                    tx  <= 0;
+                    if (baud_cnt == BAUD_TICKS - 1) begin
+                        baud_cnt    <= 0;
+                        bit_idx     <= 0;
+                        state       <= DATA_BITS;
+                    end 
+                    else begin
+                        baud_cnt    <= baud_cnt + 1;
+                    end
+                 end
+                 
+                 DATA_BITS: begin
+                    tx  <= shift_reg[bit_idx];
+                    if (baud_cnt == BAUD_TICKS - 1) begin
+                        baud_cnt    <= 0;
+                        if (bit_idx == 3'd7) 
+                            state <= STOP_BIT;
+                        else
+                            bit_idx <= bit_idx + 1;
+                    end
+                    else
+                        baud_cnt <= baud_cnt + 1;
+                 end
+                 
+                 STOP_BIT: begin
+                    tx      <= 1;
+                    if (baud_cnt == BAUD_TICKS - 1) begin
+                        baud_cnt    <= 0;
+                        state       <= IDLE;
+                    end
+                    else
+                        baud_cnt <= baud_cnt + 1;
+                 end
+              endcase
         end
     
     end
-    
-// TODO: 
-/*
-   - FSM: [idle] -> [start_bit] -> [data_bits] -> [stop_bit]
-   - bauds counter
-   - shift_reg for data
-   - bit_idx 0..7
 
-*/
 endmodule
