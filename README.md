@@ -34,3 +34,4 @@ UART transmitter in SystemVerilog, tested in simulation and on Nexys A7.
 - Combine with fpga-counter, send the counter data
 - Apply a clock_divider and a slow clock singal, debugging with leds every step, toggling at bit_idx one led, simulating the send of each one.
 - Use the 7-seg display to show the FSM state in slow_clock setups, to debug
+- Create UART RX
